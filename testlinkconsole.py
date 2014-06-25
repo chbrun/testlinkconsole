@@ -4,6 +4,7 @@ import os
 import sys
 import datetime
 import string
+import logging
 from xml.dom.minidom import parse
 from testlink import TestlinkAPIClient, TestLinkHelper
 from colorama import init
@@ -14,6 +15,7 @@ class TestLinkConsole(cmd.Cmd):
 
     prompt = colored('testlink :','grey')
     intro = colored('Testlink Console client','green')
+    logger = 0
 
     projetid = 0
     campagneid = 0
@@ -25,7 +27,7 @@ class TestLinkConsole(cmd.Cmd):
     LIST_OBJECTS = [ 'projets', 'campagnes', 'tests']
     LIST_VARIABLE = [ 'projetid', 'campagneid', 'serverUrl', 'serverKey', 'output']
 
-    def __init__(self, config):
+    def __init__(self, config, logger):
         self.serverUrl = config.get("testlink", "url")
         self.serverKey = config.get("testlink", "key")
         try:
@@ -37,6 +39,7 @@ class TestLinkConsole(cmd.Cmd):
         except:
             self.campagneid = 0
         self.apiclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
+        self.logger = logger
         cmd.Cmd.__init__(self)
 
     # SHOW 
@@ -136,6 +139,7 @@ class TestLinkConsole(cmd.Cmd):
     # RUN
     def do_run(self, line):
         starttime = datetime.datetime.now()
+        self.logger.info('Debut de la campagne : %s' % starttime)
         i=0
         tests = self.apiclient.getTestCasesForTestPlan(testplanid=self.campagneid, execution_type=2)
         nbtest = len(tests)
@@ -183,7 +187,7 @@ class TestLinkConsole(cmd.Cmd):
                 else:
                     result.append(colored('%6s : %60s : NOK' % (testid, test_todo['tcase_name']),'red'))
                 print result
-
+                self.logger.info(result)
             except:
                 try:
                     retour = self.apiclient.reportTCResult(testcaseid=test_todo['testcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n Erreur execution : site non accessible par exemple')
@@ -191,13 +195,14 @@ class TestLinkConsole(cmd.Cmd):
                     retour = "Erreur de remonte de retour"
             i+=1
             progressbar.update(i)
-        print result
         progressbar.finish()
         endtime = datetime.datetime.now()
+        self.logger.info('Fin de la campagne : %s' % endtime)
         for i in result:
             print i
         difftime = endtime - starttime
         print "Execution : %s" % difftime
+        self.logger.info('Temps Execution de la campagne : %s ' % difftime)
 
     def help_run(self):
         print '\n'.join([' run',
@@ -222,5 +227,9 @@ if __name__ == '__main__':
     init()
     config = ConfigParser.RawConfigParser()
     config.read("testlinkclient.cfg")
-    console = TestLinkConsole(config)
+    logger = logging.getLogger('logger')
+    logger.addHandler(logging.FileHandler(filename='testlinkconsole.log'))
+    logger.setLevel(logging.INFO)
+    #logger.setFormatter(logging.Formatter('%(asctime)s - %s(message)s'))
+    console = TestLinkConsole(config, logger)
     console.cmdloop()
