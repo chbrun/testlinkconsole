@@ -1,4 +1,4 @@
-import cmd
+import cmd2
 import ConfigParser
 import os
 import sys
@@ -7,14 +7,13 @@ import string
 import logging
 from xml.dom.minidom import parse
 from testlink import TestlinkAPIClient, TestLinkHelper
-from colorama import init
 from termcolor import colored
 from progressbar import ProgressBar
 
-class TestLinkConsole(cmd.Cmd):
+class TestLinkConsole(cmd2.Cmd):
 
-    prompt = colored('testlink :','grey')
-    intro = colored('Testlink Console client','green')
+    prompt = colored('testlink : ','green')
+    intro = colored('Testlink Console client','grey')
     logger = 0
 
     projetid = 0
@@ -25,30 +24,28 @@ class TestLinkConsole(cmd.Cmd):
     output = False
 
     LIST_OBJECTS = [ 'projets', 'campagnes', 'tests']
-    LIST_VARIABLE = [ 'projetid', 'campagneid', 'serverUrl', 'serverKey', 'output']
+    LIST_VARIABLE = { 
+            'projetid'   : 'ID projet', 
+            'campagneid' : 'ID campagne',
+            'serverUrl'  : 'Url du serveur testlink',
+            'serverKey'  : 'API Key du server',
+            'output'     : 'Output',
+            }
 
     def __init__(self, config, logger):
-        self.serverUrl = config.get("testlink", "url")
-        self.serverKey = config.get("testlink", "key")
-        try:
-            self.projetid = config.get("testlink", "projetid")
-        except:
-            self.projetid = 0
-        try:
-            self.campagneid = config.get("testlink","campagneid")
-        except:
-            self.campagneid = 0
+        for variable in self.LIST_VARIABLE.keys():
+            try:
+                setattr(self,variable,config.get("testlink",variable))
+            except:
+                print colored("Variable %s undefined in cfg file" % variable,'red')
         self.apiclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
         self.logger = logger
-        cmd.Cmd.__init__(self)
+        cmd2.Cmd.__init__(self)
 
     # SHOW 
     def do_show(self, line):
-        print "Url server  : " + colored(self.serverUrl, 'grey')
-        print "Key server  : " + colored(self.serverKey, 'grey')
-        print "ID project  : " + colored(self.projetid, 'green')
-        print "ID campagne : " + colored(self.campagneid, 'green')
-        print "output      : " + colored(self.output, 'green')
+        for (variable, description) in self.LIST_VARIABLE.iteritems():
+            print "%25s : %s" % (description, colored(getattr(self, variable),'green'))
 
     def help_show(self):
         print '\n'.join([ 'show',
@@ -62,8 +59,9 @@ class TestLinkConsole(cmd.Cmd):
             for projet in projets:
                 print "%6s --> %50s" % (projet['id'], projet['name'])
         elif content == 'campagnes':
-            if self.projetid == 0:
-                print colored('set projetid before', 'red')
+            if self.projetid == '0':
+                #print colored('set projetid before', 'red')
+                self.perror('set projetid before');
             else:
                 campagnes = self.apiclient.getProjectTestPlans(testprojectid = self.projetid)
                 for campagne in campagnes:
@@ -95,7 +93,7 @@ class TestLinkConsole(cmd.Cmd):
 
     # GET
     def do_get(self, variable):
-        if variable not in self.LIST_VARIABLE:
+        if variable not in self.LIST_VARIABLE.keys():
             print colored('Variable not found','red')
         else:
             print "%s : %s" % (variable,getattr(self, variable))
@@ -107,10 +105,10 @@ class TestLinkConsole(cmd.Cmd):
 
     def complete_get(self, text, line, begids, endidx):
         if not text:
-            completions = self.LIST_VARIABLE[:]
+            completions = self.LIST_VARIABLE.keys()[:]
         else:
             completions = [ f
-                    for f in self.LIST_VARIABLE
+                    for f in self.LIST_VARIABLE.keys()
                     if f.startswith(text)
                     ]
         return completions
@@ -126,15 +124,7 @@ class TestLinkConsole(cmd.Cmd):
                           ])
 
     def complete_set(self, text, line, begidx, endidx):
-        #return self.complete_get(self, text, line, begidx, endidx)
-        if not text:
-            completions = self.LIST_VARIABLE[:]
-        else:
-            completions = [ f
-                    for f in self.LIST_VARIABLE
-                    if f.startswith(text)
-                    ]
-        return completions
+        return self.complete_get(text, line, begidx, endidx)
 
     # RUN
     def do_run(self, line):
@@ -181,16 +171,18 @@ class TestLinkConsole(cmd.Cmd):
                         notes = notes + '      Erreur : '+failure.getAttribute('message')+'\n'
                 notes = notes + '\n'
             try:
-                retour = self.apiclient.reportTCResult(testcaseid=test_todo['testcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n %s' % notes)
+                retour = self.apiclient.reportTCResult(testcaseid=test_todo['tcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n %s' % notes)
                 if resultglobal=='p':
-                    result.append(colored('%6s : %60s : OK' % (testid, test_todo['tcase_name']),'green'))
+                    msg='%6s : %60s : OK' % (testid, test_todo['tcase_name'])
+                    result.append(colored(msg,'green'))
+                    self.logger.info(msg)
                 else:
-                    result.append(colored('%6s : %60s : NOK' % (testid, test_todo['tcase_name']),'red'))
-                print result
-                self.logger.info(result)
+                    msg='%6s : %60s : NOK' % (testid, test_todo['tcase_name'])
+                    result.append(colored(msg,'red'))
+                    self.logger.error(msg)
             except:
                 try:
-                    retour = self.apiclient.reportTCResult(testcaseid=test_todo['testcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n Erreur execution : site non accessible par exemple')
+                    retour = self.apiclient.reportTCResult(testcaseid=test_todo['tcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n Erreur execution : site non accessible par exemple')
                 except:
                     retour = "Erreur de remonte de retour"
             i+=1
@@ -211,10 +203,8 @@ class TestLinkConsole(cmd.Cmd):
 
     # SAVE config
     def do_save(self, line):
-        config.set('testlink','projetid',self.projetid)
-        config.set('testlink','campagneid',self.campagneid)
-        config.set('testlink','url',self.serverUrl)
-        config.set('testlink','key',self.serverKey)
+        for variable in self.LIST_VARIABLE.keys():
+            config.set('testlink',variable,getattr(self,variable))
         with open('testlinkclient.cfg','wb') as configfile:
             config.write(configfile)
 
@@ -224,7 +214,6 @@ class TestLinkConsole(cmd.Cmd):
         return True
 
 if __name__ == '__main__':
-    init()
     config = ConfigParser.RawConfigParser()
     config.read("testlinkclient.cfg")
     logger = logging.getLogger('logger')
