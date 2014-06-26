@@ -32,3 +32,8 @@ Commande à la console
 
 A noter que la console recharge automatiquement le fichier cfg au démarrage, ce qui évite de revaloriser les variables à chaque utilisation
 
+
+TODO
+====
+* cmd run : run one test
+* add variable UserAgent 
