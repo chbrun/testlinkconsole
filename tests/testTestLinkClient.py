@@ -5,15 +5,16 @@ import mox
 from testlinkclient import TestlinkClient
 from testlink import TestlinkAPIClient
 
-class TestlinkClientTest(unittest.TestCase):
+class TestingClassTestlinkAPIClient(TestlinkAPIClient):
+    def __init__(self, server_url,  devkey):
+        super(TestingClassTestlinkAPIClient, self).__init__(server_url, devkey)
 
-    #def __init__(self, *args, **kw):
-    #    unittest.TestCase.__init__(self, *args, **kw)
+class TestlinkClientTest(unittest.TestCase):
 
     def setUp(self):
         self.mocker = mox.Mox()
-        self.apiclient = self.mocker.CreateMock(TestlinkAPIClient)
-        self.testlinkclient = TestlinkClient(self.apiclient('localhost','test'))
+        self.apiclient = self.mocker.CreateMock(TestingClassTestlinkAPIClient)
+        self.testlinkclient = TestlinkClient(self.apiclient)
 
     def testListProjets(self):
         projetsIn=[
@@ -28,9 +29,16 @@ class TestlinkClientTest(unittest.TestCase):
         self.mocker.ReplayAll()
         self.assertEquals(self.testlinkclient.listProjets(),projetsOut)
 
-    @unittest.skip("TODO")
     def testListCampagnes(self):
-        raise Exception('TODO')
+        campagnesIn=[
+                {'id':'1', 'name':'campagne1', 'description':'description1'}, 
+                ]
+        campagnesOut=[
+                {'id':'1', 'name':'campagne1'}, 
+                ]
+        self.apiclient.getProjectTestPlans(testprojectid=1).AndReturn(campagnesIn)
+        self.mocker.ReplayAll()
+        self.assertEquals(self.testlinkclient.listCampagnes(1), campagnesOut)
 
     @unittest.skip("TODO")
     def testListTests(self):
@@ -44,3 +52,5 @@ class TestlinkClientTest(unittest.TestCase):
     def testRunTest(self):
         raise Exception('TODO')
 
+if __name__ == '__main__':
+    unittest.main()
