@@ -1,6 +1,6 @@
 testlinkconsole
 ===============
-
+[![Build Status](https://travis-ci.org/chbrun/testlinkconsole.svg?branch=master)](https://travis-ci.org/chbrun/testlinkconsole)
 console d'accès testlink
 
 Installation
