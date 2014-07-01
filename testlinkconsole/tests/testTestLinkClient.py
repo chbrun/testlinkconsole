@@ -16,36 +16,36 @@ class TestlinkClientTest(unittest.TestCase):
         self.apiclient = self.mocker.CreateMock(TestingClassTestlinkAPIClient)
         self.testlinkclient = TestlinkClient(self.apiclient)
 
-    def testListProjets(self):
-        projetsIn=[
+    def testListProjects(self):
+        projectsIn=[
                 {'id':'1', 'name':'projet1', 'description':'description1'}, 
                 {'id':'2', 'name':'projet2', 'description':'description2'},
                 ]
-        projetsOut=[
+        projectsOut=[
                 {'id':'1', 'name':'projet1'}, 
                 {'id':'2', 'name':'projet2'},
                 ]
-        self.apiclient.getProjects().AndReturn(projetsIn)
+        self.apiclient.getProjects().AndReturn(projectsIn)
         self.mocker.ReplayAll()
-        self.assertEquals(self.testlinkclient.listProjets(),projetsOut)
+        self.assertEquals(self.testlinkclient.listProjects(),projectsOut)
 
-    def testListCampagnes(self):
-        campagnesIn=[
+    def testListTestPlans(self):
+        testPlansIn=[
                 {'id':'1', 'name':'campagne1', 'description':'description1'}, 
                 ]
-        campagnesOut=[
+        testPlansOut=[
                 {'id':'1', 'name':'campagne1'}, 
                 ]
-        self.apiclient.getProjectTestPlans(testprojectid=1).AndReturn(campagnesIn)
+        self.apiclient.getProjectTestPlans(testprojectid=1).AndReturn(testPlansIn)
         self.mocker.ReplayAll()
-        self.assertEquals(self.testlinkclient.listCampagnes(1), campagnesOut)
+        self.assertEquals(self.testlinkclient.listTestPlans(1), testPlansOut)
 
     @unittest.skip("TODO")
-    def testListTests(self):
+    def testListTestCasess(self):
         raise Exception('TODO')
 
     @unittest.skip("TODO")
-    def testRunCampagne(self):
+    def testRunTestPlan(self):
         raise Exception('TODO')
 
     @unittest.skip("TODO")

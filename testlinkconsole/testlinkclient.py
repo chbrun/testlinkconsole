@@ -4,7 +4,7 @@ class TestlinkClient:
     def __init__(self, apiclient):
         self.apiclient = apiclient
 
-    def listProjets(self):
+    def listProjects(self):
         result=[]
         for projet in self.apiclient.getProjects():
             result.append(
@@ -14,7 +14,7 @@ class TestlinkClient:
                         })
         return result
 
-    def listCampagnes(self, projectid):
+    def listTestPlans(self, projectid):
         result=[]
         for campagne in self.apiclient.getProjectTestPlans(testprojectid=projectid):
             result.append(
