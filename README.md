@@ -1,6 +1,8 @@
 testlinkconsole
 ===============
 [![Build Status](https://travis-ci.org/chbrun/testlinkconsole.svg?branch=master)](https://travis-ci.org/chbrun/testlinkconsole)
+[![Coverage Status](https://coveralls.io/repos/chbrun/testlinkconsole/badge.png?branch=master)](https://coveralls.io/r/chbrun/testlinkconsole?branch=master)
+
 console d'accès testlink
 
 Installation
