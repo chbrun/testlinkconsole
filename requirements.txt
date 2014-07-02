@@ -21,3 +21,4 @@ cmd2==0.6.7
 termcolor==1.1.0
 progressbar2==2.6.2
 Yapsy==1.10.423
+coverage==3.7.1
