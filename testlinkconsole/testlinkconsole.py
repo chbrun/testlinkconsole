@@ -1,4 +1,3 @@
-import cmd2
 import ConfigParser
 import os
 import sys
@@ -10,12 +9,15 @@ from testlink import TestlinkAPIClient, TestLinkHelper
 from termcolor import colored
 from progressbar import ProgressBar, Bar
 from yapsy.PluginManager import PluginManager
+from lib.consoleBase import ConsoleBase
 
 
-class TestLinkConsole(cmd2.Cmd):
+class TestLinkConsole(ConsoleBase):
 
     prompt = colored('testlink : ','green')
     intro = colored('Testlink Console client','grey')
+    section = 'testlink'
+    configFile = 'testlinkclient.cfg'
     logger = 0
 
     projetid = 0
@@ -38,29 +40,20 @@ class TestLinkConsole(cmd2.Cmd):
             }
 
     def __init__(self, config, logger):
-        for variable in self.LIST_VARIABLE.keys():
-            try:
-                setattr(self,variable,config.get("testlink",variable))
-            except:
-                print colored("Variable %s undefined in cfg file" % variable,'red')
-        self.apiclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
+        ConsoleBase.__init__(self,config) 
         self.logger = logger
         self.plugins = PluginManager()
         self.plugins.setPluginPlaces(['%s/plugins' % os.path.dirname(os.path.realpath(__file__))])
         self.plugins.collectPlugins()
         for pluginInfo in self.plugins.getAllPlugins():
             self.plugins.activatePluginByName(pluginInfo.name)
-        cmd2.Cmd.__init__(self)
 
-    # SHOW 
-    def do_show(self, line):
-        for (variable, description) in self.LIST_VARIABLE.iteritems():
-            print "%25s : %s" % (description, colored(getattr(self, variable),'green'))
-
-    def help_show(self):
-        print '\n'.join([ 'show',
-                        'sho config'
-                        ])
+    def initConnexion(self):
+        try:
+            self.apiclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
+        except:
+            raise Exception("Connection impossible")
+            pass
 
     def do_plugins(self, line):
         for pluginInfo in self.plugins.getAllPlugins():
@@ -105,41 +98,6 @@ class TestLinkConsole(cmd2.Cmd):
         print '\n'.join([ 'list [content]', 
                         ' list content from testlink'
                         ])
-
-    # GET
-    def do_get(self, variable):
-        if variable not in self.LIST_VARIABLE.keys():
-            print colored('Variable not found','red')
-        else:
-            print "%s : %s" % (variable,getattr(self, variable))
-
-    def help_get(self):
-        print '\n'.join([ 'get [variable]',
-                        ' show variable value'
-                        ])
-
-    def complete_get(self, text, line, begids, endidx):
-        if not text:
-            completions = self.LIST_VARIABLE.keys()[:]
-        else:
-            completions = [ f
-                    for f in self.LIST_VARIABLE.keys()
-                    if f.startswith(text)
-                    ]
-        return completions
-    
-    # SET
-    def do_set(self, arg):
-        (variable, value) = arg.split(' ')
-        setattr(self, variable, value)
-
-    def help_set(self):
-        print '\n'.join([ 'set [variable] [value]',
-                          'set varibale with value'
-                          ])
-
-    def complete_set(self, text, line, begidx, endidx):
-        return self.complete_get(text, line, begidx, endidx)
 
     # RUN
     def do_run(self, line):
@@ -196,19 +154,11 @@ class TestLinkConsole(cmd2.Cmd):
                          ' run campagne'
                          ])
 
-    # SAVE config
-    def do_save(self, line):
-        for variable in self.LIST_VARIABLE.keys():
-            config.set('testlink',variable,getattr(self,variable))
-        with open('testlinkclient.cfg','wb') as configfile:
-            config.write(configfile)
-
-
 if __name__ == '__main__':
     config = ConfigParser.RawConfigParser()
-    config.read("testlinkclient.cfg")
     logger = logging.getLogger('logger')
     logger.addHandler(logging.FileHandler(filename='testlinkconsole.log'))
     logger.setLevel(logging.INFO)
     console = TestLinkConsole(config, logger)
+    console.initConnexion()
     console.cmdloop()
