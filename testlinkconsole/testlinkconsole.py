@@ -9,7 +9,7 @@ from testlink import TestlinkAPIClient, TestLinkHelper
 from termcolor import colored
 from progressbar import ProgressBar, Bar
 from yapsy.PluginManager import PluginManager
-from lib.consoleBase import ConsoleBase
+from libs.consoleBase import ConsoleBase
 
 
 class TestLinkConsole(ConsoleBase):
