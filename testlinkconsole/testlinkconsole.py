@@ -8,7 +8,9 @@ import logging
 from xml.dom.minidom import parse
 from testlink import TestlinkAPIClient, TestLinkHelper
 from termcolor import colored
-from progressbar import ProgressBar
+from progressbar import ProgressBar, Bar
+from yapsy.PluginManager import PluginManager
+
 
 class TestLinkConsole(cmd2.Cmd):
 
@@ -22,6 +24,8 @@ class TestLinkConsole(cmd2.Cmd):
     serverKey = ''
     apiclient = ''
     output = False
+    runner = ''
+    plugins = ''
 
     LIST_OBJECTS = [ 'projets', 'campagnes', 'tests']
     LIST_VARIABLE = { 
@@ -30,6 +34,7 @@ class TestLinkConsole(cmd2.Cmd):
             'serverUrl'  : 'Url du serveur testlink',
             'serverKey'  : 'API Key du server',
             'output'     : 'Output',
+            'runner'     : 'test runner (plugin : behat, behave ...)',
             }
 
     def __init__(self, config, logger):
@@ -40,6 +45,11 @@ class TestLinkConsole(cmd2.Cmd):
                 print colored("Variable %s undefined in cfg file" % variable,'red')
         self.apiclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
         self.logger = logger
+        self.plugins = PluginManager()
+        self.plugins.setPluginPlaces(['%s/plugins' % os.path.dirname(os.path.realpath(__file__))])
+        self.plugins.collectPlugins()
+        for pluginInfo in self.plugins.getAllPlugins():
+            self.plugins.activatePluginByName(pluginInfo.name)
         cmd2.Cmd.__init__(self)
 
     # SHOW 
@@ -51,6 +61,11 @@ class TestLinkConsole(cmd2.Cmd):
         print '\n'.join([ 'show',
                         'sho config'
                         ])
+
+    def do_plugins(self, line):
+        for pluginInfo in self.plugins.getAllPlugins():
+            print colored("%25s : %s" % (pluginInfo.name, pluginInfo.description), 'grey')
+        print "runner actif : %s " % self.runner
 
     # LIST
     def do_list(self, content):
@@ -133,14 +148,13 @@ class TestLinkConsole(cmd2.Cmd):
         i=0
         tests = self.apiclient.getTestCasesForTestPlan(testplanid=self.campagneid, execution_type=2)
         nbtest = len(tests)
-        result=[]
-        progressbar = ProgressBar(maxval=nbtest).start()
+        resultLog=[]
+        progressbar = ProgressBar(maxval=nbtest, widgets=[Bar(marker='|')]).start()
         for (testid, test) in tests.items():
             test_todo = test[0]
             notes=''
             script_behat = self.apiclient.getTestCaseCustomFieldDesignValue(testcaseexternalid=test_todo['full_external_id'],version=1,testprojectid=self.projetid,customfieldname='scriptBehat',details='full')
             scriptALancer=script_behat['value']
-            fichierResult=scriptALancer.split('/')[-1].split('.')[0]
             browsers = self.apiclient.getTestCaseCustomFieldDesignValue(testcaseexternalid=test_todo['full_external_id'],version=1,testprojectid=self.projetid,customfieldname='Browsers',details='full')
             if browsers['value']=='':
                 browserlist=['default']
@@ -148,37 +162,18 @@ class TestLinkConsole(cmd2.Cmd):
                 browserlist = browsers['value'].split('|')
             for browser in browserlist:
                 notes = notes + " ====> Browser : %s\n" % browser
-                behat='behat --profile %s  --format=junit --out=./result/%s/ features/%s' % (browser,browser,scriptALancer)
-                os.system(behat)
-                try:
-                    resultxml=parse('result/%s/TEST-%s.xml' % (browser,fichierResult))
-                    testCaseList = resultxml.getElementsByTagName('testcase')
-                    error = resultxml.getElementsByTagName('testsuite')[0].getAttribute('errors')
-                    failure = resultxml.getElementsByTagName('testsuite')[0].getAttribute('failures')
-                    notes = notes + resultxml.getElementsByTagName('testsuite')[0].getAttribute('name')+'\n'
-                except:
-                    error = 0
-                    failure = 1
-                    notes = 'Tests sous %s non passe' % browser
-                if error == '0' and failure == '0':
-                    resultglobal='p'
-                else:
-                    resultglobal='f'
-                for testcase in testCaseList:
-                    notes = notes+testcase.getAttribute('name')+'\n   Temps execution : %s' % testcase.getAttribute('time')+'\n'
-                    failuresList = testcase.getElementsByTagName('failure')
-                    for failure in failuresList:
-                        notes = notes + '      Erreur : '+failure.getAttribute('message')+'\n'
-                notes = notes + '\n'
+                runner = self.plugins.getPluginByName(self.runner)
+                runner.plugin_object.run(browser,scriptALancer)
+                (result, notes) = runner.plugin_object.result(browser,scriptALancer)
             try:
-                retour = self.apiclient.reportTCResult(testcaseid=test_todo['tcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=resultglobal,notes='Resultats du Test Auto (Behat) \n\n %s' % notes)
-                if resultglobal=='p':
+                retour = self.apiclient.reportTCResult(testcaseid=test_todo['tcase_id'],testplanid=self.campagneid,buildname='Validation bascule production',status=result,notes='Resultats du Test Auto (Behat) \n\n %s' % notes)
+                if result=='p':
                     msg='%6s : %60s : OK' % (testid, test_todo['tcase_name'])
-                    result.append(colored(msg,'green'))
+                    resultLog.append(colored(msg,'green'))
                     self.logger.info(msg)
                 else:
                     msg='%6s : %60s : NOK' % (testid, test_todo['tcase_name'])
-                    result.append(colored(msg,'red'))
+                    resultLog.append(colored(msg,'red'))
                     self.logger.error(msg)
             except:
                 try:
@@ -190,7 +185,7 @@ class TestLinkConsole(cmd2.Cmd):
         progressbar.finish()
         endtime = datetime.datetime.now()
         self.logger.info('Fin de la campagne : %s' % endtime)
-        for i in result:
+        for i in resultLog:
             print i
         difftime = endtime - starttime
         print "Execution : %s" % difftime
@@ -209,16 +204,11 @@ class TestLinkConsole(cmd2.Cmd):
             config.write(configfile)
 
 
-    # STOP CONSOLE
-    def do_EOF(self, line):
-        return True
-
 if __name__ == '__main__':
     config = ConfigParser.RawConfigParser()
     config.read("testlinkclient.cfg")
     logger = logging.getLogger('logger')
     logger.addHandler(logging.FileHandler(filename='testlinkconsole.log'))
     logger.setLevel(logging.INFO)
-    #logger.setFormatter(logging.Formatter('%(asctime)s - %s(message)s'))
     console = TestLinkConsole(config, logger)
     console.cmdloop()
