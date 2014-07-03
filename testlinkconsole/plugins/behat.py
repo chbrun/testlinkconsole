@@ -19,19 +19,20 @@ class BehatPlugin(IPlugin):
 
     def run(self, profile, script):
         behat='behat --profile %s  --format=junit --out=./result/%s/ features/%s' % (profile,profile,script)
-        os.system(behat)
+        return os.system(behat)
 
     def result(self, profile, script):
         fileResult = self.getFileResult(script)
         resultFinal = ''
         testCaseList=[]
+        notes=''
         try:
-            resultXml = parse('result/%s/TEST-%s.xml' % (profile, fileResult))
+            resultxml = parse('result/%s/TEST-%s.xml' % (profile, fileResult))
             testCaseList = resultxml.getElementsByTagName('testcase')
             error = resultxml.getElementsByTagName('testsuite')[0].getAttribute('errors')
             failure = resultxml.getElementsByTagName('testsuite')[0].getAttribute('failures')
             notes = notes + resultxml.getElementsByTagName('testsuite')[0].getAttribute('name')+'\n'
-        except:
+        except Exception as e:
             error = 0
             failure = 1
             notes = 'Tests sous %s non passe' % profile
