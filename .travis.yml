@@ -6,6 +6,6 @@ install:
     - pip install coveralls
 script:
     - python -m unittest discover
-    - coverage run -m unittest discover testlinkconsole --rcfile=.coveragerc
+    - coverage run --rcfile=.coveragerc -m unittest discover testlinkconsole 
 after_success:
     - coveralls --config_file .coveragerc
