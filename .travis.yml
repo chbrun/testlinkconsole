@@ -8,4 +8,4 @@ script:
     - python -m unittest discover
     - coverage run --rcfile=.coveragerc -m unittest discover testlinkconsole 
 after_success:
-    - coveralls --config_file .coveragerc
+    - coveralls --rcfile=.coveragerc
