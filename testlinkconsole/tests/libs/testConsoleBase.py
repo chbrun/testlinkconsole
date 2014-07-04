@@ -13,6 +13,9 @@ class TestconsoleBase(unittest.TestCase):
     def test_help_config(self):
         self.assertEquals(self.consoleBase.help_config(),None)
     
+    def test_do_config(self):
+        self.assertEquals(self.consoleBase.do_config(),None)
+    
     @unittest.skip('todo')
     def test_help_save(self):
         self.assertEquals(self.consoleBase.help_save(),None)
@@ -22,6 +25,15 @@ class TestconsoleBase(unittest.TestCase):
     
     def test_help_set(self):
         self.assertEquals(self.consoleBase.help_set(),None)
+
+    def test_do_get(self):
+        self.assertEquals(self.consoleBase.do_get(),None)
+
+    def test_do_set(self):
+        self.assertEquals(self.consoleBase.do_set(),None)
+
+    def test_do_save(self):
+        self.assertEquals(self.consoleBase.do_save(),None)
 
 if __name__ == '__main__':
     unittest.main()
