@@ -1,5 +1,5 @@
 import unittest
-import mox
+import mock
 
 from plugins.behave import BehavePlugin
 
@@ -8,15 +8,16 @@ class TestBehavePlugin(unittest.TestCase):
     def setUp(self):
         self.plugin = BehavePlugin()
 
-    def testactivate(self):
+    def test_activate(self):
         self.assertEquals(self.plugin.activate(), "Behave plugin actif")
 
-    def testdeactivate(self):
+    def test_deactivate(self):
         self.assertEquals(self.plugin.deactivate(), "Behave plugin inactif")
 
-    @unittest.skip("TODO")
-    def testrun(self):
-        raise Exception("TODO")
+    @mock.patch('__builtin__.print')
+    def test_run(self, mock_print):
+        mock_print.assert_has_calls([])
+        self.assertEquals(self.plugin.run('profile','script'),None)
 
 
 if __name__ == '__main__':

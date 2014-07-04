@@ -23,7 +23,14 @@ class TestconsoleBase(unittest.TestCase):
         self.assertEquals(self.consoleBase.do_config('line'),None)
    
     # SAVE
-    def test_do_save(self):
+    @unittest.skip('A finir : TODO')
+    @mock.patch('__builtin__.open')
+    @mock.patch('libs.consoleBase.config')
+    def test_do_save(self, mock_open, mock_config):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande',}
+        self.consoleBase.commande='test'
+        mock_open.assert_has_calls([])
+        mock_config.set().assert_has_calls([])
         self.assertEquals(self.consoleBase.do_save('line'),None)
 
     @unittest.skip('todo')
@@ -39,9 +46,26 @@ class TestconsoleBase(unittest.TestCase):
         self.assertEquals(self.consoleBase.help_get(),None)
     
     @mock.patch('__builtin__.print')
-    def test_do_get(self, mock_print):
+    def test_do_get_variableNotFound(self, mock_print):
         mock_print.assert_has_calls([])
         self.assertEquals(self.consoleBase.do_get('line'),None)
+
+    @mock.patch('__builtin__.print')
+    def test_do_get_variable(self, mock_print):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande',}
+        self.consoleBase.commande='test'
+        mock_print.assert_has_calls([])
+        self.assertEquals(self.consoleBase.do_get('commande'),None)
+
+    def test_complete_get_notext(self):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande',}
+        self.assertEquals(self.consoleBase.complete_get('','line','ids','idx'),['commande',])
+        self.assertEquals(self.consoleBase.complete_get('com','line','ids','idx'),['commande',])
+
+    def test_complete_get_cmd(self):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande', 'autre' : 'autre commande',}
+        self.assertItemsEqual(self.consoleBase.complete_get('','line','ids','idx'),['commande','autre'])
+        self.assertEquals(self.consoleBase.complete_get('com','line','ids','idx'),['commande',])
 
     # SET
     @mock.patch('__builtin__.print')
@@ -53,6 +77,16 @@ class TestconsoleBase(unittest.TestCase):
     def test_do_set(self, mock_print):
         mock_print.assert_has_calls([])
         self.assertEquals(self.consoleBase.do_set('variable value'),None)
+
+    def test_complete_set_notext(self):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande',}
+        self.assertEquals(self.consoleBase.complete_set('','line','ids','idx'),['commande',])
+        self.assertEquals(self.consoleBase.complete_set('com','line','ids','idx'),['commande',])
+
+    def test_complete_set_cmd(self):
+        self.consoleBase.LIST_VARIABLE={'commande' : 'une commande', 'autre' : 'autre commande',}
+        self.assertItemsEqual(self.consoleBase.complete_set('','line','ids','idx'),['commande','autre'])
+        self.assertEquals(self.consoleBase.complete_set('com','line','ids','idx'),['commande',])
 
 if __name__ == '__main__':
     unittest.main()
