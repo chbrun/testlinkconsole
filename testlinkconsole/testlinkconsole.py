@@ -4,11 +4,12 @@ import sys
 import datetime
 import string
 import logging
-from xml.dom.minidom import parse
 from testlink import TestlinkAPIClient, TestLinkHelper
 from termcolor import colored
 from progressbar import ProgressBar, Bar
 from yapsy.PluginManager import PluginManager
+from libs.iRunnerPlugin import IRunnerPlugin
+from libs.iBDTestPlugin import IBDTestPlugin
 from libs.consoleBase import ConsoleBase
 
 
@@ -43,6 +44,10 @@ class TestLinkConsole(ConsoleBase):
         ConsoleBase.__init__(self,config) 
         self.logger = logger
         self.plugins = PluginManager()
+        self.plugins.setCategoriesFilter({
+            "Runner" : IRunnerPlugin,
+            "BDTest" : IBDTestPlugin,
+            })
         self.plugins.setPluginPlaces(['%s/plugins' % os.path.dirname(os.path.realpath(__file__))])
         self.plugins.collectPlugins()
         for pluginInfo in self.plugins.getAllPlugins():
@@ -56,8 +61,10 @@ class TestLinkConsole(ConsoleBase):
             pass
 
     def do_plugins(self, line):
-        for pluginInfo in self.plugins.getAllPlugins():
-            print colored("%25s : %s" % (pluginInfo.name, pluginInfo.description), 'grey')
+        for categorie in self.plugins.getCategories():
+            print colored('%s' % categorie, 'white')
+            for pluginInfo in self.plugins.getPluginsOfCategory(categorie):
+                print colored("%25s : %s" % (pluginInfo.name, pluginInfo.description), 'grey')
         print "runner actif : %s " % self.runner
 
     # LIST

@@ -1,6 +1,6 @@
-from yapsy.IPlugin import IPlugin
+from libs.iRunnerPlugin import IRunnerPlugin
 
-class BehavePlugin(IPlugin):
+class BehavePlugin(IRunnerPlugin):
     def activate(self):
         super(BehavePlugin, self).activate()
         return "Behave plugin actif"

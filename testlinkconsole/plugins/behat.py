@@ -1,8 +1,8 @@
 import os
-from yapsy.IPlugin import IPlugin
+from libs.iRunnerPlugin import IRunnerPlugin
 from xml.dom.minidom import parse
 
-class BehatPlugin(IPlugin):
+class BehatPlugin(IRunnerPlugin):
 
     fileResult = ''
 
