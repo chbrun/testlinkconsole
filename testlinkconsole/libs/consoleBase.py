@@ -13,6 +13,10 @@ class ConsoleBase(cmd2.Cmd):
     
     def __init__(self, config):
         self.config = config
+        self.read_config()
+        cmd2.Cmd.__init__(self)
+
+    def read_config(self):
         self.config.read(self.configFile)
         for variable in self.LIST_VARIABLE.keys():
             try:
@@ -20,7 +24,6 @@ class ConsoleBase(cmd2.Cmd):
             except Exception as e:
                 print e
                 print colored("Variable %s undefined in cfg file %s section %s" % (variable,self.configFile, self.section), 'red')
-        cmd2.Cmd.__init__(self)
 
     # config
     def do_config(self, line):
@@ -61,7 +64,7 @@ class ConsoleBase(cmd2.Cmd):
 
     def help_set(self):
         print '\n'.join([ 'set [variable] [value]',
-                          'set varibale with value'
+                          'set variable with value'
                         ])
 
     def complete_set(self, text, line, begidx, endidx):
@@ -74,4 +77,9 @@ class ConsoleBase(cmd2.Cmd):
             self.config.set(self.section,variable,getattr(self,variable))
         with open(self.configFile,'wb') as configfile:
             self.config.write(configfile)
+
+    def help_save(self):
+        print '\n'.join([ 'save',
+                          'save config'
+                          ])
 

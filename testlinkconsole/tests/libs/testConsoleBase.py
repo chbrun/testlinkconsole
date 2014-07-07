@@ -11,6 +11,11 @@ class TestconsoleBase(unittest.TestCase):
     def setUp(self):
         self.consoleBase = ConsoleBase(ConfigParser.RawConfigParser())
 
+    def test_read_config(self):
+        self.consoleBase.LIST_VARIABLE={'commande': 'Un commande',}
+        self.assertEquals(self.consoleBase.read_config(), None)
+
+
     # CONFIG
     @mock.patch('__builtin__.print')
     def test_help_config(self, mock_print):
@@ -20,20 +25,21 @@ class TestconsoleBase(unittest.TestCase):
     @mock.patch('__builtin__.print')
     def test_do_config(self,mock_print):
         mock_print.assert_has_calls([])
+        self.consoleBase.LIST_VARIABLE={'commande': 'Un commande',}
+        self.consoleBase.commande='test'
         self.assertEquals(self.consoleBase.do_config('line'),None)
    
     # SAVE
-    @unittest.skip('A finir : TODO')
     @mock.patch('__builtin__.open')
-    @mock.patch('libs.consoleBase.config')
-    def test_do_save(self, mock_open, mock_config):
+    def test_do_save(self, mock_open):
+        configuration = ConfigParser.RawConfigParser()
+        configuration.add_section('console')
         self.consoleBase.LIST_VARIABLE={'commande' : 'une commande',}
         self.consoleBase.commande='test'
+        self.consoleBase.config=configuration
         mock_open.assert_has_calls([])
-        mock_config.set().assert_has_calls([])
         self.assertEquals(self.consoleBase.do_save('line'),None)
 
-    @unittest.skip('todo')
     @mock.patch('__builtin__.print')
     def test_help_save(self, mock_print):
         mock_print.assert_has_calls([])
