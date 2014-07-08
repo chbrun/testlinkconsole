@@ -6,7 +6,7 @@ import ConfigParser
 import logging
 
 from StringIO import StringIO
-from testlinkclient import TestlinkClient
+#from testlinkclient import TestlinkClient
 from testlinkconsole import TestLinkConsole
 from testlink import TestlinkAPIClient
 
@@ -26,11 +26,10 @@ class TestTestLinkConsole(unittest.TestCase):
     def test_do_plugins(self):
         self.assertEquals(self.testlinkconsole.do_plugins('line'),None)
 
-    @unittest.skip('TODO')
+    # LIST
     def test_do_list_project(self):
         self.assertEquals(self.testlinkconsole.do_list('projects'),None)
 
-    @unittest.skip('TODO')
     def test_do_list_campagnes(self):
         self.assertEquals(self.testlinkconsole.do_list('campagnes'), None)
 
@@ -50,6 +49,10 @@ class TestTestLinkConsole(unittest.TestCase):
         self.assertEquals(self.testlinkconsole.help_list(),None)
         output = out.getvalue().strip()
         self.assertEquals(output, 'list [content]\n list content from testlink')
+
+    # RUN
+    def test_run(self):
+        self.assertEquals(self.testlinkconsole.do_run('line'), None)
 
     @mock.patch('__builtin__.print')
     def  test_help_run(self, mock_print):
