@@ -1,7 +1,9 @@
 #import unittest2 as unittest
 import unittest
 import mock
+import sys
 from mock import call
+from StringIO import StringIO
 import ConfigParser
 
 from libs.consoleBase import ConsoleBase
@@ -9,6 +11,9 @@ from libs.consoleBase import ConsoleBase
 class TestconsoleBase(unittest.TestCase):
 
     def setUp(self):
+        sav_stdout = sys.stdout
+        self.out = StringIO()
+        sys.stdout = self.out
         self.consoleBase = ConsoleBase(ConfigParser.RawConfigParser())
 
     def test_read_config(self):
@@ -21,6 +26,8 @@ class TestconsoleBase(unittest.TestCase):
     def test_help_config(self, mock_print):
         mock_print.assert_has_calls([])
         self.assertEquals(self.consoleBase.help_config(),None)
+        output = self.out.getvalue().strip()
+        self.assertEquals(output, 'config\nshow configuration')
    
     @mock.patch('__builtin__.print')
     def test_do_config(self,mock_print):

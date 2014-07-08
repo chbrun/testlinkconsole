@@ -1,9 +1,11 @@
 import unittest
 import mock
 import mox
+import sys
 import ConfigParser
 import logging
 
+from StringIO import StringIO
 from testlinkclient import TestlinkClient
 from testlinkconsole import TestLinkConsole
 from testlink import TestlinkAPIClient
@@ -41,11 +43,21 @@ class TestTestLinkConsole(unittest.TestCase):
 
     @mock.patch('__builtin__.print')
     def  test_help_list(self, mock_print):
+        sav_stdout = sys.stdout
+        out = StringIO()
+        sys.stdout = out
         mock_print.assert_has_call([])
         self.assertEquals(self.testlinkconsole.help_list(),None)
+        output = out.getvalue().strip()
+        self.assertEquals(output, 'list [content]\n list content from testlink')
 
     @mock.patch('__builtin__.print')
     def  test_help_run(self, mock_print):
+        sav_stdout = sys.stdout
+        out = StringIO()
+        sys.stdout = out
         mock_print.assert_has_call([])
         self.assertEquals(self.testlinkconsole.help_run(),None)
+        output = out.getvalue().strip()
+        self.assertEquals(output, 'run\n  run campagne')
 

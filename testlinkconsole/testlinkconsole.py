@@ -157,8 +157,8 @@ class TestLinkConsole(ConsoleBase):
         self.logger.info('Temps Execution de la campagne : %s ' % difftime)
 
     def help_run(self):
-        print '\n'.join([' run',
-                         ' run campagne'
+        print '\n'.join(['run',
+                         '  run campagne'
                          ])
 
 if __name__ == '__main__':
