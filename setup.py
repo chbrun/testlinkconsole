@@ -15,13 +15,19 @@ setup(
     description = ("Testlink Console "),
     license = "BSD",
     keywords = "console testlink",
-    url = "http://packages.python.org/an_example_pypi_project",
+    url = "https://github.com/chbrun/testlinkconsole",
     packages=find_packages(),
     classifiers=[
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
             "License :: OSI Approved :: BSD License",
             ],
+    install_requires=[
+        "termcolor",
+        "progressbar2",
+        "yapsy",
+        "cmd2",
+        ],
 
 
 )
