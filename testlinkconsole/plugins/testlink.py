@@ -1,5 +1,6 @@
 from libs.iBDTestPlugin import IBDTestPlugin
 
+
 class TestlinkPlugin(IBDTestPlugin):
 
     testlinkclient = ''

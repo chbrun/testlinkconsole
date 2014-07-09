@@ -19,6 +19,22 @@ class TestBehatPlugin(unittest.TestCase):
     def test_getFileResult(self):
         self.assertEquals(self.plugin.getFileResult('script_a_lancer.feature'),'script_a_lancer')
 
+    @unittest.skip('TODO')
+    def test_loadConfigPlugin(self):
+        pass
+
+    @unittest.skip('TODO')
+    def test_saveConfigPlugin(self):
+        pass
+
+    @unittest.skip('TODO')
+    def test_loadConfigRunner(self):
+        pass
+
+    @unittest.skip('TODO')
+    def test_saveConfigRunner(self):
+        pass
+
     def test_run(self):
         os.system=mock.Mock(return_value=0)
         self.assertEquals(self.plugin.run('profile','script'),0)

@@ -7,7 +7,7 @@ import logging
 #from testlink import TestlinkAPIClient, TestLinkHelper
 from termcolor import colored
 from progressbar import ProgressBar, Bar
-from yapsy.PluginManager import PluginManager
+from yapsy.PluginManager import PluginManagerSingleton
 from libs.iRunnerPlugin import IRunnerPlugin
 from libs.iBDTestPlugin import IBDTestPlugin
 from libs.consoleBase import ConsoleBase
@@ -43,7 +43,8 @@ class TestLinkConsole(ConsoleBase):
     def __init__(self, config, logger):
         ConsoleBase.__init__(self,config) 
         self.logger = logger
-        self.plugins = PluginManager()
+        self.plugins = PluginManagerSingleton.get()
+        self.plugins.app = self
         self.plugins.setCategoriesFilter({
             "Runner" : IRunnerPlugin,
             "BDTest" : IBDTestPlugin,
