@@ -1,6 +1,6 @@
 [Core]
 Name = TestlinkPlugin
-Module = testlink
+Module = ptestlink
 
 [Documentation]
 Description = BDD connecteur pour stockage des tests

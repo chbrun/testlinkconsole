@@ -1,12 +1,17 @@
 from libs.iBDTestPlugin import IBDTestPlugin
+from testlink import TestlinkAPIClient
 
 
 class TestlinkPlugin(IBDTestPlugin):
 
     testlinkclient = ''
+    serverUrl = ''
+    serverKey = ''
 
-    def init(self, apiclient):
-        self.testlinkclient = apiclient
+    def init(self, config):
+        self.serverUrl = config.get('testlink', 'serverUrl') 
+        self.serverKey = config.get('testlink', 'serverKey') 
+        self.testlinkclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
 
     def activate(self):
         super(TestlinkPlugin, self).activate()
@@ -41,11 +46,12 @@ class TestlinkPlugin(IBDTestPlugin):
 
     def listTestCases(self, testplanid):
         result=[]
-        for testcase in self.testlinkclient.getTestCasesForTestPlan(testplanid=testplanid):
+        for (testcaseid, testcase) in self.testlinkclient.getTestCasesForTestPlan(testplanid=testplanid, execution_type=2).items():
             result.append(
                     {
-                        'id' : testcase['id'],
-                        'name' : testcase['name'],
+                        'id' : testcase[0]['tcase_id'],
+                        'name' : testcase[0]['tcase_name'],
+                        'extid' : testcase[0]['full_external_id'],
                         })
         return result
 
