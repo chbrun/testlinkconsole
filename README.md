@@ -3,39 +3,84 @@ testlinkconsole
 [![Build Status](https://travis-ci.org/chbrun/testlinkconsole.svg?branch=master)](https://travis-ci.org/chbrun/testlinkconsole)
 [![Coverage Status](https://coveralls.io/repos/chbrun/testlinkconsole/badge.png?branch=master)](https://coveralls.io/r/chbrun/testlinkconsole?branch=master)
 
-console d'accès testlink
+Testlink console run script test with behat. 
 
 Installation
 ============
-* Cloner le repo
-* configuration dans le fichier testlinkclient.cfg l'url d'acces à testlink et la clé d'API (elle se trouve dans le projet)
-* Le projet de test sous testlink doit utiliser les variables personnalisées suivantes dans les testcases :
-  * scriptBehat : type string : va contenir le chemin vers le script behat à lancer automatiquement
-  * Browsers : type checkbox : sera utilisé par le script pour appeler behat selon le profil. J'utilise un profil par navigateur.
 
-Utilisation
-===========
-* lancer le script
-* utiliser les commandes directement à la console
-* afficher l'aide
-* la console utiliser la completion des commandes
+## github
+* Clonning repo
+* change settings in testlinkclient.cfg : serverUrl and serverKey (serverKey is in testlink)
+* Add custom variable in testlink :
+  * scriptBehat : type string. It contains path to testcase file.
+  * Browsers : type checkbox : Browser to use for testcase
 
-Commande à la console
-=====================
-* help : l'aide
-* save : sauvegarde les paramètres dans le fichier cfg
-* list : liste les objets de testlink (projets, campagnes, tests)
-  * A noter que pour lister les campagnes, les tests, il faut setter un projet
-* show : affiche les variables de la console
-* set  : permet de setter une variable
-  * Ex : set projetid 1 
-* get  : récupère la valeur d'une variable
-* run  : lance la campagne de test à condition d'avoir spécifié le projet et la campagne.
+## package pypi
+To install testlinkconsole with pip, simply : 
+```bash
+ pip install testlinkconsole
+```
 
-A noter que la console recharge automatiquement le fichier cfg au démarrage, ce qui évite de revaloriser les variables à chaque utilisation
+Usage
+=====
+
+* start console with
+```bash
+testlinkconsole
+```
+* Configure testlink access :
+```bash
+config
+set serverUrl http://[monserver]/
+set serverKey [APIKey]
+```
+>APIKey is on the project page in testlink
+
+* you must setting a project id 
+```bash
+list projects
+set projectid [num of project]
+```
+* then set a testplan
+```
+list testplans
+set testplanid [num of testplan]
+```
+* Finally run test plan
+```bash
+run
+```
+>You must have behat and selenium installed et run selenium with
+
+```bash
+java -jar Selenium-[version].jar
+```
+
+
+Console command
+===============
+* help   : commands help
+* save   : save config (testlinkclient.dfg)
+* list   : list projects, testplans, testcases, ...
+  * Rmq : list testplans is only available when projectid is valued
+* config : affiche les variables de la console
+* set    : set variable (projectid, testplanid, ...)
+  * Ex : set projectid 1 
+* get  : get value of variable
+* run  : run test plan
+
+> Note that the console will automatically reload the cfg file at startup, which avoids upgrade variables for each use
 
 
 TODO
 ====
-* cmd run : run one test
-* add variable UserAgent 
+- [ ] cmd run : run one test
+- [ ] add variable UserAgent 
+- [X] plugins system 
+- [ ] report system
+- [ ] Storage system 
+  - [ ] : testlink storage : 50%
+  - [ ] : local storage
+- [ ] runner plugins
+  - [X] : Behat
+  - [ ] : Behave
