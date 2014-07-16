@@ -1,6 +1,7 @@
 import unittest
 import mock
 import mox
+import ConfigParser
 
 from plugins.ptestlink import TestlinkPlugin
 from testlink import TestlinkAPIClient
@@ -16,13 +17,14 @@ class TestTestlinkPlugin(unittest.TestCase):
         self.mocker = mox.Mox()
         self.apiclient = self.mocker.CreateMock(TestingClassTestlinkAPIClient)
         self.plugin = TestlinkPlugin()
-        self.plugin.init(self.apiclient)
+        try:
+            self.plugin.init(ConfigParser.RawConfigParser())
+        except IOError:
+            self.plugin.testlinkclient = self.apiclient
 
-    @unittest.skip('TODO')
     def test_activate(self):
         self.assertEquals(self.plugin.activate(), "Testlink plugin actif")
 
-    @unittest.skip('TODO')
     def test_deactivate(self):
         self.assertEquals(self.plugin.deactivate(), "Testlink plugin inactif")
 
@@ -32,7 +34,6 @@ class TestTestlinkPlugin(unittest.TestCase):
         mock_print.assert_has_calls([])
         self.assertEquals(self.plugin.run('profile','script'),None)
 
-    @unittest.skip('TODO')
     def test_listProjects(self):
         projectsIn=[
                 {'id':'1', 'name':'projet1', 'description':'description1'},
@@ -46,7 +47,6 @@ class TestTestlinkPlugin(unittest.TestCase):
         self.mocker.ReplayAll()
         self.assertEquals(self.plugin.listProjects(),projectsOut)
 
-    @unittest.skip('TODO')
     def test_listTestPlans(self):
         testPlansIn=[
                 {'id':'1', 'name':'campagne1', 'description':'description1'},
@@ -58,15 +58,14 @@ class TestTestlinkPlugin(unittest.TestCase):
         self.mocker.ReplayAll()
         self.assertEquals(self.plugin.listTestPlans(1), testPlansOut)
 
-    @unittest.skip('TODO')
     def test_listTestCases(self):
-        testCasesIn=[
-                {'id':'1', 'name':'test1', 'description':'description du test 1'},
-                ]
+        testCasesIn={'test1' : [
+            {'tcase_id':'1', 'tcase_name':'test1', 'description':'description du test 1', 'full_external_id':'234'},
+                ]}
         testCasesOut=[
-                {'id':'1', 'name':'test1'},
+                {'id':'1', 'name':'test1', 'extid': '234'},
                 ]
-        self.apiclient.getTestCasesForTestPlan(testplanid=1).AndReturn(testCasesIn)
+        self.apiclient.getTestCasesForTestPlan(testplanid=1, execution_type=2).AndReturn(testCasesIn)
         self.mocker.ReplayAll()
         self.assertEquals(self.plugin.listTestCases(1), testCasesOut)
 

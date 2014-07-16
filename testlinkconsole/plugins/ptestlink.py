@@ -1,5 +1,6 @@
 from libs.iBDTestPlugin import IBDTestPlugin
 from testlink import TestlinkAPIClient
+from ConfigParser import NoSectionError
 
 
 class TestlinkPlugin(IBDTestPlugin):
@@ -9,8 +10,14 @@ class TestlinkPlugin(IBDTestPlugin):
     serverKey = ''
 
     def init(self, config):
-        self.serverUrl = config.get('testlink', 'serverUrl') 
-        self.serverKey = config.get('testlink', 'serverKey') 
+        try:
+            self.serverUrl = config.get('testlink', 'serverUrl') 
+        except NoSectionError:
+            self.serverUrl = ''
+        try:
+            self.serverKey = config.get('testlink', 'serverKey') 
+        except NoSectionError:
+            self.serverKey = ''
         self.testlinkclient = TestlinkAPIClient(self.serverUrl, self.serverKey)
 
     def activate(self):
