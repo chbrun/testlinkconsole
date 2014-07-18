@@ -14,7 +14,7 @@ class BehatPlugin(IRunnerPlugin):
         super(BehatPlugin, self).deactivate()
         return "Behat plugin inactif"
 
-    def getFileResult(self, script):
+    def get_fileresult(self, script):
         return script.split('/')[-1].split('.')[0]
 
     def run(self, profile, script):
@@ -22,7 +22,7 @@ class BehatPlugin(IRunnerPlugin):
         return os.system(behat)
 
     def result(self, profile, script):
-        fileResult = self.getFileResult(script)
+        fileResult = self.get_fileresult(script)
         resultFinal = ''
         testCaseList=[]
         notes=''
@@ -46,7 +46,7 @@ class BehatPlugin(IRunnerPlugin):
             for failure in failuresList:
                 notes = notes + '      Erreur : '+failure.getAttribute('message')+'\n'
         notes = notes + '\n'
-        return (resultFinal, notes)
+        return resultFinal, notes
 
 
 

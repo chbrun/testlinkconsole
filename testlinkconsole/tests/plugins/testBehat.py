@@ -16,23 +16,23 @@ class TestBehatPlugin(unittest.TestCase):
     def test_deactivate(self):
         self.assertEquals(self.plugin.deactivate(), "Behat plugin inactif")
 
-    def test_getFileResult(self):
-        self.assertEquals(self.plugin.getFileResult('script_a_lancer.feature'),'script_a_lancer')
+    def test_get_fileresult(self):
+        self.assertEquals(self.plugin.get_fileresult('script_a_lancer.feature'),'script_a_lancer')
 
     @unittest.skip('TODO')
-    def test_loadConfigPlugin(self):
+    def test_load_config_plugin(self):
         pass
 
     @unittest.skip('TODO')
-    def test_saveConfigPlugin(self):
+    def test_save_config_plugin(self):
         pass
 
     @unittest.skip('TODO')
-    def test_loadConfigRunner(self):
+    def test_load_config_runner(self):
         pass
 
     @unittest.skip('TODO')
-    def test_saveConfigRunner(self):
+    def test_save_config_runner(self):
         pass
 
     def test_run(self):

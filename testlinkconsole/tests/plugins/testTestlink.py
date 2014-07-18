@@ -34,7 +34,7 @@ class TestTestlinkPlugin(unittest.TestCase):
         mock_print.assert_has_calls([])
         self.assertEquals(self.plugin.run('profile','script'),None)
 
-    def test_listProjects(self):
+    def test_list_projects(self):
         projectsIn=[
                 {'id':'1', 'name':'projet1', 'description':'description1'},
                 {'id':'2', 'name':'projet2', 'description':'description2'},
@@ -45,9 +45,9 @@ class TestTestlinkPlugin(unittest.TestCase):
                 ]
         self.apiclient.getProjects().AndReturn(projectsIn)
         self.mocker.ReplayAll()
-        self.assertEquals(self.plugin.listProjects(),projectsOut)
+        self.assertEquals(self.plugin.list_projects(),projectsOut)
 
-    def test_listTestPlans(self):
+    def test_list_testplans(self):
         testPlansIn=[
                 {'id':'1', 'name':'campagne1', 'description':'description1'},
                     ]
@@ -56,9 +56,9 @@ class TestTestlinkPlugin(unittest.TestCase):
                     ]
         self.apiclient.getProjectTestPlans(testprojectid=1).AndReturn(testPlansIn)
         self.mocker.ReplayAll()
-        self.assertEquals(self.plugin.listTestPlans(1), testPlansOut)
+        self.assertEquals(self.plugin.list_testplans(1), testPlansOut)
 
-    def test_listTestCases(self):
+    def test_list_testcases(self):
         testCasesIn={'test1' : [
             {'tcase_id':'1', 'tcase_name':'test1', 'description':'description du test 1', 'full_external_id':'234'},
                 ]}
@@ -67,26 +67,26 @@ class TestTestlinkPlugin(unittest.TestCase):
                 ]
         self.apiclient.getTestCasesForTestPlan(testplanid=1, execution_type=2).AndReturn(testCasesIn)
         self.mocker.ReplayAll()
-        self.assertEquals(self.plugin.listTestCases(1), testCasesOut)
+        self.assertEquals(self.plugin.list_testcases(1), testCasesOut)
 
     @unittest.skip('TODO')
-    def test_getInfoProject(self):
+    def test_get_info_project(self):
         pass
 
     @unittest.skip('TODO')
-    def test_getInfoTestPlan(self):
+    def test_get_info_testplan(self):
         pass
 
     @unittest.skip('TODO')
-    def test_getInfoTestCase(self):
+    def test_get_info_testcase(self):
         pass
 
     @unittest.skip('TODO')
-    def test_runTestPlan(self):
+    def test_run_testplan(self):
         pass
 
     @unittest.skip('TODO')
-    def test_runTestCase(self):
+    def test_run_testcase(self):
         pass
 
 if __name__ == '__main__':

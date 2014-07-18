@@ -10,4 +10,4 @@ class BehavePlugin(IRunnerPlugin):
         return "Behave plugin inactif"
 
     def run(self, browser, script):
-        print "Behave run %s with %s" % (script, browser)
+        print("Behave run %s with %s" % (script, browser))

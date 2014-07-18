@@ -16,14 +16,14 @@ class BDLocalPlugin(IBDTestPlugin):
         return "BDLocal plugin inactif"
 
     def run(self, browser, script):
-        print "BDLocal run %s with %s" % (script, browser)
+        print("BDLocal run %s with %s" % (script, browser))
 
     @staticmethod
     def do_createlocal(self,line ):
-        print "Bonjour du plugins"
+        print("Bonjour du plugins")
 
     @staticmethod
     def help_createlocal(self):
-        print '\n'.join([' createlocal plugins',
+        print('\n'.join([' createlocal plugins',
                          'juste un test pour le fun'
-                         ])
+                         ]))

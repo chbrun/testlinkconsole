@@ -20,35 +20,35 @@ class TestBDLocalPlugin(unittest.TestCase):
         self.assertEquals(self.plugin.run('profile','script'),None)
 
     @unittest.skip('TODO')
-    def test_listProjects(self):
+    def test_list_projects(self):
         pass
 
     @unittest.skip('TODO')
-    def test_listTestPlans(self):
+    def test_list_testplans(self):
         pass
 
     @unittest.skip('TODO')
-    def test_listTestCases(self):
+    def test_list_testcases(self):
         pass
 
     @unittest.skip('TODO')
-    def test_getInfoProject(self):
+    def test_get_info_project(self):
         pass
 
     @unittest.skip('TODO')
-    def test_getInfoTestPlan(self):
+    def test_get_info_testplan(self):
         pass
 
     @unittest.skip('TODO')
-    def test_getInfoTestCase(self):
+    def test_get_info_testcase(self):
         pass
 
     @unittest.skip('TODO')
-    def test_runTestPlan(self):
+    def test_run_testplan(self):
         pass
 
     @unittest.skip('TODO')
-    def test_runTestCase(self):
+    def test_run_testcase(self):
         pass
 
 if __name__ == '__main__':

@@ -59,7 +59,7 @@ class TestconsoleBase(unittest.TestCase):
         self.assertEquals(self.consoleBase.help_get(),None)
     
     @mock.patch('__builtin__.print')
-    def test_do_get_variableNotFound(self, mock_print):
+    def test_do_get_variable_notfound(self, mock_print):
         mock_print.assert_has_calls([])
         self.assertEquals(self.consoleBase.do_get('line'),None)
 

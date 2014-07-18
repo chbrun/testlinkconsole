@@ -29,9 +29,9 @@ class TestlinkPlugin(IBDTestPlugin):
         return "Testlink plugin inactif"
 
     def run(self, browser, script):
-        print "Testlink run %s with %s" % (script, browser)
+        print("Testlink run %s with %s" % (script, browser))
 
-    def listProjects(self):
+    def list_projects(self):
         result=[]
         for project in self.testlinkclient.getProjects():
             result.append(
@@ -41,7 +41,7 @@ class TestlinkPlugin(IBDTestPlugin):
                         })
         return result
 
-    def listTestPlans(self, projectid):
+    def list_testplans(self, projectid):
         result=[]
         for testplan in self.testlinkclient.getProjectTestPlans(testprojectid=projectid):
             result.append(
@@ -51,9 +51,13 @@ class TestlinkPlugin(IBDTestPlugin):
                         })
         return result
 
-    def listTestCases(self, testplanid):
+    def list_testcases(self, testplanid):
         result=[]
-        for (testcaseid, testcase) in self.testlinkclient.getTestCasesForTestPlan(testplanid=testplanid, execution_type=2).items():
+        testcases = self.testlinkclient.getTestCasesForTestPlan(
+                testplanid=testplanid, 
+                execution_type=2
+                )
+        for testcaseid, testcase in testcases.items():
             result.append(
                     {
                         'id' : testcase[0]['tcase_id'],
