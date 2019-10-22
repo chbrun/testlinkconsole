@@ -9,7 +9,7 @@ Pygments==1.6
 Sphinx==1.2.2
 TestLink-API-Python-client==0.4.8
 docutils==0.11
-ecdsa==0.11
+ecdsa==0.13.3
 mock==1.0.1
 mox==0.5.3
 paramiko==1.14.0
