@@ -5,7 +5,7 @@ requests==2.3.0
 wheel==0.23.0
 Jinja2==2.7.3
 MarkupSafe==0.23
-Pygments==1.6
+Pygments==2.7.4
 Sphinx==1.2.2
 TestLink-API-Python-client==0.4.8
 docutils==0.11
