@@ -1,5 +1,5 @@
 Fabric==1.9.0
-ipython==2.1.0
+ipython==7.16.3
 pkginfo==1.1
 requests==2.3.0
 wheel==0.23.0
